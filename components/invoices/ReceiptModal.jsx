@@ -35,9 +35,9 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full flex-col flex items-center justify-start my-8">
-        <div className="w-full max-w-md flex justify-end gap-2 mb-4 shrink-0">
+    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
+      <div className="w-full max-w-md mx-auto flex-col flex items-center justify-start mt-4 sm:mt-8 pb-16">
+        <div className="w-full flex justify-end gap-2 mb-4 shrink-0">
           <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
             <Download size={16} /> Export
           </button>
