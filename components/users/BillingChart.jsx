@@ -25,7 +25,8 @@ export default function BillingChart({ invoices }) {
       Total: Number(inv.total_amount),
       Rent: Number(inv.rent_amount),
       Utilities: Number(inv.shared_bill_amount),
-      Paid: Number(inv.amount_paid)
+      Paid: Number(inv.amount_paid),
+      Electricity: Number(inv.electricity || 0)
     };
   });
 
@@ -48,6 +49,7 @@ export default function BillingChart({ invoices }) {
           <option value="Paid">Amount Paid Only</option>
           <option value="Rent">Base Rent Only</option>
           <option value="Utilities">Utilities Only</option>
+          <option value="Electricity">Electricity Trend</option>
         </select>
       </div>
 
@@ -78,6 +80,9 @@ export default function BillingChart({ invoices }) {
               )}
               {(selectedMetric === 'All' || selectedMetric === 'Utilities') && (
                 <Line type="monotone" dataKey="Utilities" name="Utilities Contribution" stroke="#3b82f6" strokeWidth={selectedMetric === 'Utilities' ? 3 : 2} strokeDasharray="5 5" dot={selectedMetric === 'Utilities' ? { r: 3 } : false} activeDot={{ r: 5 }} />
+              )}
+              {(selectedMetric === 'All' || selectedMetric === 'Electricity') && (
+                <Line type="monotone" dataKey="Electricity" name="Bldg. Electricity" stroke="#f43f5e" strokeWidth={selectedMetric === 'Electricity' ? 3 : 2} strokeDasharray="3 3" dot={selectedMetric === 'Electricity' ? { r: 3 } : false} activeDot={{ r: 5 }} />
               )}
             </LineChart>
           </ResponsiveContainer>
