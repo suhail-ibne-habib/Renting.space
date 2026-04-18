@@ -35,21 +35,22 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 overflow-y-auto">
-      <div className="min-h-full p-4 sm:p-8 text-center pb-24">
-        
-        {/* Buttons */}
-        <div className="w-full max-w-md mx-auto flex justify-end gap-2 mb-4 pt-4 sm:pt-8 relative z-10">
-           <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
-            <Download size={16} /> Export
-          </button>
-          <button onClick={onClose} className="bg-rose-50 text-rose-600 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-rose-100 flex items-center gap-2 hover:bg-rose-100 transition-colors">
-            Close
-          </button>
-        </div>
-        
+    <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex flex-col">
+      
+      {/* Fixed Sticky Header for Buttons */}
+      <div className="w-full bg-black/40 p-4 shrink-0 shadow-lg relative z-20 flex justify-end gap-3 items-center" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+        <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
+          <Download size={16} /> Export
+        </button>
+        <button onClick={onClose} className="bg-rose-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 hover:bg-rose-600 transition-colors">
+          <X size={16} /> Close
+        </button>
+      </div>
+
+      {/* Independently Scrollable Body */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center items-start pb-24">
         {/* Receipt content wrapper */}
-        <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full mx-auto rounded-2xl print:rounded-none shadow-2xl print:shadow-none text-left relative overflow-hidden flex flex-col">
+        <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full rounded-2xl print:rounded-none shadow-2xl print:shadow-none text-left relative overflow-hidden flex flex-col mt-4 sm:mt-0">
            <div className="p-8 pb-4">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-md"><Building2 size={24} /></div>
