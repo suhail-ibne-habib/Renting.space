@@ -6,12 +6,11 @@ import {
   getCoreRowModel, 
   getPaginationRowModel,
   getFilteredRowModel,
-  flexRender 
-} from '@tanstack/react-table';
-import { FileText, DollarSign, X, CheckCircle, Clock, Plus, Wifi, Droplets, Wind, Zap, Home, Calculator, Search, Eye, Building2, Trash2, ChevronDown, ChevronUp, Download, FileSpreadsheet } from 'lucide-react';
+import { flexRender } from '@tanstack/react-table';
+import { FileText, DollarSign, CheckCircle, Clock, Plus, Wifi, Droplets, Wind, Zap, Home, Calculator, Search, Eye, Building2, Trash2, ChevronDown, ChevronUp, FileSpreadsheet } from 'lucide-react';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
-import { toJpeg } from 'html-to-image';
+import ReceiptModal from '../../../components/invoices/ReceiptModal';
 
 export default function BillingAndInvoicesPage() {
   const [activeTab, setActiveTab] = useState('invoices'); // 'invoices' or 'bills'
@@ -203,31 +202,7 @@ export default function BillingAndInvoicesPage() {
     }
   };
 
-  const receiptRef = useRef();
 
-  const handleDownloadPDF = async () => {
-    setLoading(true);
-    try {
-      const element = receiptRef.current;
-      const dataUrl = await toJpeg(element, { 
-        quality: 1.0, 
-        pixelRatio: 2.0,
-        height: element.scrollHeight,
-        canvasHeight: element.scrollHeight,
-        style: { transform: 'none' } 
-      });
-      
-      const link = document.createElement('a');
-      link.download = `Receipt_INV-${selectedInvoice.id.toString().padStart(5, '0')}.jpg`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to generate PDF");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleExportCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
@@ -878,116 +853,12 @@ export default function BillingAndInvoicesPage() {
       )}
 
       {/* SINGLE INVOICE RECEIPT MODAL */}
-      {isReceiptModalOpen && selectedInvoice && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-           <div className="w-full flex-col flex items-center justify-start my-8">
-             <div className="w-full max-w-md flex justify-end gap-2 mb-4 shrink-0">
-               <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
-                 <Download size={16} /> Export
-               </button>
-               <button onClick={() => setIsReceiptModalOpen(false)} className="bg-rose-50 text-rose-600 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-rose-100 flex items-center gap-2 hover:bg-rose-100 transition-colors">
-                 Close
-               </button>
-             </div>
-             
-             <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full rounded-2xl print:rounded-none shadow-2xl print:shadow-none print:mx-auto relative shrink-0 overflow-hidden flex flex-col">
-                <div className="p-8 pb-4">
-                   <div className="flex items-center gap-3 mb-6">
-                     <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-md"><Building2 size={24} /></div>
-                     <div>
-                       <h2 className="text-xl font-black text-slate-800 leading-tight">{softwareName || 'Skyview Residences'}</h2>
-                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Official Receipt</p>
-                     </div>
-                   </div>
-
-                  <div className="flex justify-between items-end border-b-2 border-slate-100 pb-6 mb-6">
-                     <div>
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Billed To</p>
-                       <h3 className="text-lg font-bold text-slate-800">{selectedInvoice.user_name}</h3>
-                       <p className="text-sm text-slate-500">{selectedInvoice.user_email}</p>
-                     </div>
-                     <div className="text-right">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Invoice ID</p>
-                       <p className="font-mono font-bold text-slate-800 text-sm">#INV-{selectedInvoice.id.toString().padStart(5, '0')}</p>
-                       <p className="text-xs text-slate-500 mt-1">{monthNames[selectedInvoice.month -1]} {selectedInvoice.year}</p>
-                     </div>
-                  </div>
-
-                  <div className="space-y-4 text-sm mb-6">
-                     <div className="flex justify-between items-center text-slate-600 font-semibold p-3 bg-slate-50 rounded-xl border border-slate-100">
-                       <span>Base Unit Rent</span>
-                       <span className="text-slate-900">$ {Number(selectedInvoice.rent_amount).toFixed(2)}</span>
-                     </div>
-                     <div className="bg-slate-50 rounded-xl border border-slate-100 overflow-hidden">
-                       <div className="flex justify-between items-center text-slate-600 font-semibold p-3 bg-slate-100/50">
-                         <span>Shared Utilities Overhead</span>
-                         <span className="text-slate-900">$ {Number(selectedInvoice.shared_bill_amount).toFixed(2)}</span>
-                       </div>
-                       {selectedInvoice.electricity != null && (
-                         <div className="p-3 text-xs space-y-2 border-t border-slate-100 font-medium text-slate-500 bg-white">
-                           <div className="flex justify-between items-center">
-                             <span className="flex items-center gap-1.5"><Zap size={10} className="text-amber-500"/> Electricity (Bldg Total)</span>
-                             <span>${Number(selectedInvoice.electricity).toFixed(2)}</span>
-                           </div>
-                           <div className="flex justify-between items-center">
-                             <span className="flex items-center gap-1.5"><Droplets size={10} className="text-cyan-500"/> Water (Bldg Total)</span>
-                             <span>${Number(selectedInvoice.water).toFixed(2)}</span>
-                           </div>
-                           <div className="flex justify-between items-center">
-                             <span className="flex items-center gap-1.5"><Wifi size={10} className="text-blue-500"/> WiFi (Bldg Total)</span>
-                             <span>${Number(selectedInvoice.wifi).toFixed(2)}</span>
-                           </div>
-                           <div className="flex justify-between items-center">
-                             <span className="flex items-center gap-1.5"><Wind size={10} className="text-emerald-500"/> Dust/Cleaning (Bldg Total)</span>
-                             <span>${Number(selectedInvoice.dust).toFixed(2)}</span>
-                           </div>
-                           <div className="flex justify-between items-center border-t border-dashed border-slate-200 pt-2 mt-1">
-                             <span className="text-slate-600 font-bold">Your Calculated Split</span>
-                             <span className="text-slate-700 font-bold">${Number(selectedInvoice.split_per_user).toFixed(2)}</span>
-                           </div>
-                           <div className="flex justify-between items-center">
-                             <span className="text-slate-600 font-bold flex items-center gap-1.5"><Home size={10} className="text-indigo-500"/> Maid (Bua) Flat Fee</span>
-                             <span className="text-slate-700 font-bold">${Number(selectedInvoice.bua).toFixed(2)}</span>
-                           </div>
-                         </div>
-                       )}
-                     </div>
-
-                     <div className="flex justify-between items-center p-3 border-b border-dashed border-slate-300 my-2"></div>
-
-                     <div className="flex justify-between items-center font-bold text-slate-800 px-3">
-                       <span>Total Sum Due</span>
-                       <span className="text-lg">$ {Number(selectedInvoice.total_amount).toFixed(2)}</span>
-                     </div>
-                     
-                     <div className="flex justify-between items-center font-bold px-3">
-                       <span className="text-slate-500">Payments Applied</span>
-                       <span className="text-emerald-600">- $ {Number(selectedInvoice.amount_paid).toFixed(2)}</span>
-                     </div>
-                  </div>
-                  
-                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-100 mt-6 text-xs text-blue-800 flex flex-col gap-1">
-                     <p className="font-bold">Payment Instructions:</p>
-                     <p>Please pay before the 10th day of the month to avoid any late fees.</p>
-                     <p className="font-semibold">You can pay using Bkash or Nagad to the following number: <span className="font-bold tracking-wider">01836979604</span></p>
-                  </div>
-               </div>
-
-               <div className={`${(Number(selectedInvoice.total_amount) - Number(selectedInvoice.amount_paid)) <= 0 ? 'bg-emerald-600' : 'bg-slate-800'} p-6 flex justify-between items-center text-white transition-colors`}>
-                 <div>
-                    <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">Remaining Balance</p>
-                    <p className="text-3xl font-black">$ {(Number(selectedInvoice.total_amount) - Number(selectedInvoice.amount_paid)).toFixed(2)}</p>
-                 </div>
-                 <div className="text-right">
-                   {selectedInvoice.status === 'paid' && <span className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-sm border border-white/30"><CheckCircle size={14} /> PAID IN FULL</span>}
-                   {selectedInvoice.status === 'partial' && <span className="inline-flex items-center gap-1.5 bg-amber-500/80 px-3 py-1.5 text-xs font-bold rounded-full shadow-sm text-white border border-amber-400">PARTIAL PAYMENT</span>}
-                   {selectedInvoice.status === 'unpaid' && <span className="inline-flex items-center gap-1.5 bg-rose-500/80 px-3 py-1.5 text-xs font-bold rounded-full shadow-sm text-white border border-rose-400">UNPAID</span>}
-                 </div>
-               </div>
-             </div>
-           </div>
-        </div>
-      )}
+      <ReceiptModal 
+         isOpen={isReceiptModalOpen} 
+         onClose={() => setIsReceiptModalOpen(false)} 
+         invoice={selectedInvoice} 
+         softwareName={softwareName} 
+      />
 
       {/* SINGLE BILL REPORT MODAL */}
       {isReportModalOpen && selectedBill && (
