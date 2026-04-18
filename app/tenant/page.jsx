@@ -9,15 +9,20 @@ import {
 } from '@tanstack/react-table';
 import { 
   UserCircle, Calendar, Phone, Mail, Clock, Download, 
-  FileText, CheckCircle, Zap, Wifi, Droplets, Wind, Home, File, Activity
+  FileText, CheckCircle, Zap, Wifi, Droplets, Wind, Home, File, Activity, Eye
 } from 'lucide-react';
 import Image from 'next/image';
 import BillingChart from '../../components/users/BillingChart';
+import ReceiptModal from '../../components/invoices/ReceiptModal';
 
 export default function TenantDashboard() {
   const [profile, setProfile] = useState(null);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [softwareName, setSoftwareName] = useState('');
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -32,8 +37,15 @@ export default function TenantDashboard() {
           ? `/invoices?userId=${profileRes.data.id}` 
           : '/invoices';
           
-        const invoiceRes = await api.get(invoiceUrl);
+        const [invoiceRes, settingsRes] = await Promise.all([
+           api.get(invoiceUrl),
+           api.get('/settings').catch(() => ({ data: {} }))
+        ]);
+        
         setInvoices(invoiceRes.data);
+        if (settingsRes.data?.software_name) {
+           setSoftwareName(settingsRes.data.software_name);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -42,6 +54,11 @@ export default function TenantDashboard() {
     };
     fetchData();
   }, []);
+
+  const openReceiptModal = (invoice) => {
+    setSelectedInvoice({ ...invoice, user_name: profile?.name || invoice.user_name, user_email: profile?.email || invoice.user_email });
+    setIsReceiptModalOpen(true);
+  };
 
   const columns = useMemo(() => [
       {
@@ -93,9 +110,27 @@ export default function TenantDashboard() {
            if (status === 'unpaid') color = 'bg-rose-100 text-rose-700';
            return <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${color}`}>{status}</span>
         }
+      },
+      {
+        id: 'actions',
+        header: '',
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="text-right">
+              <button 
+                onClick={() => openReceiptModal(row)} 
+                className="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-500 rounded-lg hover:bg-slate-200 transition-colors inline-flex" 
+                title="View Full Receipt"
+              >
+                <Eye size={16} />
+              </button>
+            </div>
+          )
+        }
       }
     ],
-    []
+    [profile]
   );
 
   const table = useReactTable({
@@ -262,6 +297,13 @@ export default function TenantDashboard() {
           </div>
         </div>
       </div>
+      {/* Render Receipt Modal */}
+      <ReceiptModal 
+         isOpen={isReceiptModalOpen} 
+         onClose={() => setIsReceiptModalOpen(false)} 
+         invoice={selectedInvoice} 
+         softwareName={softwareName} 
+      />
     </div>
   );
 }

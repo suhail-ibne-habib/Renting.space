@@ -6,7 +6,8 @@ import {
   getCoreRowModel, 
   getPaginationRowModel,
   getFilteredRowModel,
-import { flexRender } from '@tanstack/react-table';
+  flexRender 
+} from '@tanstack/react-table';
 import { FileText, DollarSign, CheckCircle, Clock, Plus, Wifi, Droplets, Wind, Zap, Home, Calculator, Search, Eye, Building2, Trash2, ChevronDown, ChevronUp, FileSpreadsheet } from 'lucide-react';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
