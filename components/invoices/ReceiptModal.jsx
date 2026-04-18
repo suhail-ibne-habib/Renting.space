@@ -72,16 +72,26 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
         {/* Receipt content wrapper */}
         <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full rounded-2xl print:rounded-none shadow-2xl print:shadow-none text-left relative overflow-hidden flex flex-col mt-4 sm:mt-0">
           
-          {/* Internal Action Buttons */}
-          <div id="receipt-action-buttons" className="w-full bg-slate-100 p-4 shrink-0 flex justify-end gap-3 items-center border-b border-slate-200">
-            <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
-              <Download size={16} /> {loading ? 'Exporting...' : 'Export'}
+          {/* Internal Action Icons */}
+          <div id="receipt-action-buttons" className="absolute top-4 right-4 z-20 flex gap-2">
+            <button 
+               onClick={handleDownloadPDF} 
+               disabled={loading} 
+               title="Export Receipt"
+               className="w-10 h-10 bg-slate-100/80 backdrop-blur-sm text-slate-600 flex items-center justify-center rounded-full shadow-sm border border-slate-200 hover:bg-white hover:text-blue-600 hover:scale-105 hover:shadow-md transition-all disabled:opacity-50"
+            >
+               <Download size={18} />
             </button>
-            <button onClick={onClose} className="bg-rose-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 hover:bg-rose-600 transition-colors">
-              <X size={16} /> Close
+            <button 
+               onClick={onClose} 
+               title="Close Receipt"
+               className="w-10 h-10 bg-rose-50/80 backdrop-blur-sm text-rose-500 flex items-center justify-center rounded-full shadow-sm border border-rose-100 hover:bg-rose-100 hover:text-rose-700 hover:scale-105 hover:shadow-md transition-all"
+            >
+               <X size={18} />
             </button>
           </div>
-           <div className="p-8 pb-4">
+
+           <div className="p-8 pb-4 pt-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-md"><Building2 size={24} /></div>
                 <div>
