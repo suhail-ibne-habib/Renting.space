@@ -12,7 +12,7 @@ import {
   FileText, CheckCircle, Zap, Wifi, Droplets, Wind, Home, File, Activity
 } from 'lucide-react';
 import Image from 'next/image';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import BillingChart from '../../components/users/BillingChart';
 
 export default function TenantDashboard() {
   const [profile, setProfile] = useState(null);
@@ -112,15 +112,6 @@ export default function TenantDashboard() {
   const totalPaid = invoices.reduce((sum, inv) => sum + Number(inv.amount_paid), 0);
   const totalDue = totalBilled - totalPaid;
 
-  const chartData = [...invoices].sort((a, b) => {
-    if (a.year !== b.year) return a.year - b.year;
-    return a.month - b.month;
-  }).map(inv => ({
-    cycle: `${inv.month}/${inv.year.toString().slice(-2)}`,
-    billed: Number(inv.total_amount),
-    paid: Number(inv.amount_paid)
-  }));
-
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-8">
@@ -145,25 +136,7 @@ export default function TenantDashboard() {
       </div>
 
       {/* Graphical Trends */}
-      {invoices.length > 0 && (
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-6">
-           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2"><Activity size={16}/> My Billing Trend</h3>
-           <div className="h-48 w-full">
-             <ResponsiveContainer width="100%" height="100%">
-               <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                 <XAxis dataKey="cycle" tick={{fontSize: 10, fill: '#64748b'}} tickLine={false} axisLine={false} />
-                 <YAxis tick={{fontSize: 10, fill: '#64748b'}} tickLine={false} axisLine={false}  />
-                 <Tooltip 
-                   cursor={{fill: '#f8fafc'}} 
-                   contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} 
-                 />
-                 <Bar dataKey="billed" fill="#4f46e5" radius={[4, 4, 0, 0]} name="Billed Amount" />
-                 <Bar dataKey="paid" fill="#10b981" radius={[4, 4, 0, 0]} name="Paid Amount" />
-               </BarChart>
-             </ResponsiveContainer>
-           </div>
-        </div>
-      )}
+      {invoices.length > 0 && <BillingChart invoices={invoices} />}
 
       {/* Profile Overview Card */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
@@ -178,7 +151,7 @@ export default function TenantDashboard() {
              )}
            </div>
 
-           <div className="flex justify-between items-start mt-4">
+           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mt-4 w-full">
              <div>
                <h2 className="text-2xl font-black text-slate-800">{profile.name}</h2>
                <div className="flex items-center gap-4 mt-2">

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import ReceiptModal from '../../../../components/invoices/ReceiptModal';
+import BillingChart from '../../../../components/users/BillingChart';
 
 export default function SingleUserPage() {
   const { id } = useParams();
@@ -67,14 +68,7 @@ export default function SingleUserPage() {
   const totalPaid = invoices.reduce((sum, inv) => sum + Number(inv.amount_paid), 0);
   const totalDue = totalBilled - totalPaid;
 
-  const chartData = [...invoices].sort((a, b) => {
-    if (a.year !== b.year) return a.year - b.year;
-    return a.month - b.month;
-  }).map(inv => ({
-    cycle: `${inv.month}/${inv.year.toString().slice(-2)}`,
-    billed: Number(inv.total_amount),
-    paid: Number(inv.amount_paid)
-  }));
+  // Graph data extracted to inner component
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -179,25 +173,7 @@ export default function SingleUserPage() {
         {/* Right Column: Invoices & Activities */}
         <div className="md:col-span-2 space-y-6">
           {/* Graphical Trends */}
-          {invoices.length > 0 && (
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-               <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2"><Activity size={16}/> Billing Trend</h3>
-               <div className="h-48 w-full">
-                 <ResponsiveContainer width="100%" height="100%">
-                   <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                     <XAxis dataKey="cycle" tick={{fontSize: 10, fill: '#64748b'}} tickLine={false} axisLine={false} />
-                     <YAxis tick={{fontSize: 10, fill: '#64748b'}} tickLine={false} axisLine={false}  />
-                     <Tooltip 
-                       cursor={{fill: '#f1f5f9'}} 
-                       contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} 
-                     />
-                     <Bar dataKey="billed" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Billed Amount" />
-                     <Bar dataKey="paid" fill="#10b981" radius={[4, 4, 0, 0]} name="Paid Amount" />
-                   </BarChart>
-                 </ResponsiveContainer>
-               </div>
-            </div>
-          )}
+          {invoices.length > 0 && <BillingChart invoices={invoices} />}
 
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
              <div className="flex justify-between items-center mb-6">
