@@ -31,7 +31,9 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
       const fileName = `Receipt_INV-${invoice.id.toString().padStart(5, '0')}.jpg`;
 
       // 1. Mobile-First: Attempt native Share Sheet API to prevent iOS Safari blob trapping
-      if (navigator.share) {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobileDevice && navigator.share) {
         try {
           const res = await fetch(dataUrl);
           const blob = await res.blob();
