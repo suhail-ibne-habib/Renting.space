@@ -12,7 +12,11 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
 
   const handleDownloadPDF = async () => {
     setLoading(true);
+    const btnContainer = document.getElementById('receipt-action-buttons');
+    if (btnContainer) btnContainer.style.display = 'none';
+
     try {
+      await new Promise(resolve => setTimeout(resolve, 50)); // Allow DOM repaint
       const element = receiptRef.current;
       const dataUrl = await toJpeg(element, { 
         quality: 1.0, 
@@ -21,6 +25,8 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
         canvasHeight: element.scrollHeight,
         style: { transform: 'none' } 
       });
+      
+      if (btnContainer) btnContainer.style.display = 'flex';
       
       const fileName = `Receipt_INV-${invoice.id.toString().padStart(5, '0')}.jpg`;
 
@@ -52,28 +58,29 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
     } catch (err) {
       console.error(err);
       alert("Failed to export picture");
+      if (btnContainer) btnContainer.style.display = 'flex';
     } finally {
+      if (btnContainer) btnContainer.style.display = 'flex';
       setLoading(false);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex flex-col">
-      
-      {/* Fixed Sticky Header for Buttons */}
-      <div className="w-full bg-black/40 p-4 shrink-0 shadow-lg relative z-20 flex justify-end gap-3 items-center" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
-        <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
-          <Download size={16} /> Export
-        </button>
-        <button onClick={onClose} className="bg-rose-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 hover:bg-rose-600 transition-colors">
-          <X size={16} /> Close
-        </button>
-      </div>
-
       {/* Independently Scrollable Body */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center items-start pb-24">
         {/* Receipt content wrapper */}
         <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full rounded-2xl print:rounded-none shadow-2xl print:shadow-none text-left relative overflow-hidden flex flex-col mt-4 sm:mt-0">
+          
+          {/* Internal Action Buttons */}
+          <div id="receipt-action-buttons" className="w-full bg-slate-100 p-4 shrink-0 flex justify-end gap-3 items-center border-b border-slate-200">
+            <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
+              <Download size={16} /> {loading ? 'Exporting...' : 'Export'}
+            </button>
+            <button onClick={onClose} className="bg-rose-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 hover:bg-rose-600 transition-colors">
+              <X size={16} /> Close
+            </button>
+          </div>
            <div className="p-8 pb-4">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-md"><Building2 size={24} /></div>
