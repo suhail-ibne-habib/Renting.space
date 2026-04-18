@@ -22,10 +22,33 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
         style: { transform: 'none' } 
       });
       
+      const fileName = `Receipt_INV-${invoice.id.toString().padStart(5, '0')}.jpg`;
+
+      // 1. Mobile-First: Attempt native Share Sheet API to prevent iOS Safari blob trapping
+      if (navigator.share) {
+        try {
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], fileName, { type: 'image/jpeg' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: `Receipt ${fileName}`
+            });
+            setLoading(false);
+            return; // Successfully handed off to OS
+          }
+        } catch (shareErr) {
+          console.error("Native share cancelled or failed", shareErr);
+        }
+      }
+
+      // 2. Desktop Fallback: Standard anchor download
       const link = document.createElement('a');
-      link.download = `Receipt_INV-${invoice.id.toString().padStart(5, '0')}.jpg`;
+      link.download = fileName;
       link.href = dataUrl;
       link.click();
+
     } catch (err) {
       console.error(err);
       alert("Failed to export picture");
