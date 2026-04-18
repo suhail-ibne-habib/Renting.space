@@ -35,10 +35,12 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-md mx-auto flex-col flex items-center justify-start mt-4 sm:mt-8 pb-16">
-        <div className="w-full flex justify-end gap-2 mb-4 shrink-0">
-          <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
+    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 overflow-y-auto">
+      <div className="min-h-full p-4 sm:p-8 text-center pb-24">
+        
+        {/* Buttons */}
+        <div className="w-full max-w-md mx-auto flex justify-end gap-2 mb-4 pt-4 sm:pt-8 relative z-10">
+           <button onClick={handleDownloadPDF} disabled={loading} className="bg-white text-slate-800 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-colors">
             <Download size={16} /> Export
           </button>
           <button onClick={onClose} className="bg-rose-50 text-rose-600 px-5 py-2 rounded-xl text-sm font-bold shadow-sm border border-rose-100 flex items-center gap-2 hover:bg-rose-100 transition-colors">
@@ -46,7 +48,8 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
           </button>
         </div>
         
-        <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full rounded-2xl print:rounded-none shadow-2xl print:shadow-none print:mx-auto relative shrink-0 overflow-hidden flex flex-col">
+        {/* Receipt content wrapper */}
+        <div id="receipt-content" ref={receiptRef} className="bg-white max-w-md w-full mx-auto rounded-2xl print:rounded-none shadow-2xl print:shadow-none text-left relative overflow-hidden flex flex-col">
            <div className="p-8 pb-4">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-md"><Building2 size={24} /></div>
