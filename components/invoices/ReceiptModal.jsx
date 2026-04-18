@@ -12,8 +12,11 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
 
   const handleDownloadPDF = async () => {
     setLoading(true);
+    const btnContainer = document.getElementById('receipt-action-buttons');
+    if (btnContainer) btnContainer.style.display = 'none';
 
     try {
+      await new Promise(resolve => setTimeout(resolve, 50)); // Allow DOM repaint
       const element = receiptRef.current;
       const dataUrl = await toJpeg(element, { 
         quality: 1.0, 
@@ -22,6 +25,8 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
         canvasHeight: element.scrollHeight,
         style: { transform: 'none' } 
       });
+      
+      if (btnContainer) btnContainer.style.display = 'flex';
       
       const fileName = `Receipt_INV-${invoice.id.toString().padStart(5, '0')}.jpg`;
 
@@ -53,7 +58,9 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
     } catch (err) {
       console.error(err);
       alert("Failed to export picture");
+      if (btnContainer) btnContainer.style.display = 'flex';
     } finally {
+      if (btnContainer) btnContainer.style.display = 'flex';
       setLoading(false);
     }
   };
