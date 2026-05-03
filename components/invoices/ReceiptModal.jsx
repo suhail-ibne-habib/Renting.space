@@ -67,6 +67,18 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
     }
   };
 
+  const totalBills = (Number(invoice.wifi || invoice.MasterBill?.wifi_total) || 0) + 
+                     (Number(invoice.water || invoice.MasterBill?.water_total) || 0) + 
+                     (Number(invoice.dust || invoice.MasterBill?.dust_total) || 0) + 
+                     (Number(invoice.electricity || invoice.MasterBill?.electricity_total) || 0);
+
+  const splitAmount = Number(invoice.split_per_user || (Number(invoice.shared_bill_amount) - (Number(invoice.bua || invoice.MasterBill?.bua_total) || 0))) || 0;
+
+  const myElectricity = totalBills > 0 ? ((Number(invoice.electricity || invoice.MasterBill?.electricity_total) || 0) / totalBills) * splitAmount : 0;
+  const myWater = totalBills > 0 ? ((Number(invoice.water || invoice.MasterBill?.water_total) || 0) / totalBills) * splitAmount : 0;
+  const myWifi = totalBills > 0 ? ((Number(invoice.wifi || invoice.MasterBill?.wifi_total) || 0) / totalBills) * splitAmount : 0;
+  const myDust = totalBills > 0 ? ((Number(invoice.dust || invoice.MasterBill?.dust_total) || 0) / totalBills) * splitAmount : 0;
+
   return (
     <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex flex-col">
       {/* Independently Scrollable Body */}
@@ -128,20 +140,20 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
                   {(invoice.electricity != null || invoice.MasterBill) && (
                     <div className="p-3 text-xs space-y-2 border-t border-slate-100 font-medium text-slate-500 bg-white">
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1.5"><Zap size={10} className="text-amber-500"/> Electricity (Bldg Total)</span>
-                        <span>${Number(invoice.electricity || invoice.MasterBill?.electricity_total).toFixed(2)}</span>
+                        <span className="flex items-center gap-1.5"><Zap size={10} className="text-amber-500"/> Electricity (Your Split)</span>
+                        <span>${myElectricity.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1.5"><Droplets size={10} className="text-cyan-500"/> Water (Bldg Total)</span>
-                        <span>${Number(invoice.water || invoice.MasterBill?.water_total).toFixed(2)}</span>
+                        <span className="flex items-center gap-1.5"><Droplets size={10} className="text-cyan-500"/> Water (Your Split)</span>
+                        <span>${myWater.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1.5"><Wifi size={10} className="text-blue-500"/> WiFi (Bldg Total)</span>
-                        <span>${Number(invoice.wifi || invoice.MasterBill?.wifi_total).toFixed(2)}</span>
+                        <span className="flex items-center gap-1.5"><Wifi size={10} className="text-blue-500"/> WiFi (Your Split)</span>
+                        <span>${myWifi.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1.5"><Wind size={10} className="text-emerald-500"/> Dust/Cleaning (Bldg Total)</span>
-                        <span>${Number(invoice.dust || invoice.MasterBill?.dust_total).toFixed(2)}</span>
+                        <span className="flex items-center gap-1.5"><Wind size={10} className="text-emerald-500"/> Dust/Cleaning (Your Split)</span>
+                        <span>${myDust.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center border-t border-dashed border-slate-200 pt-2 mt-1">
                         <span className="text-slate-600 font-bold">Your Calculated Split</span>

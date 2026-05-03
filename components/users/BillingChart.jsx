@@ -20,13 +20,21 @@ export default function BillingChart({ invoices }) {
   }).map(inv => {
     const date = new Date(inv.year, inv.month - 1);
     const monthName = date.toLocaleString('default', { month: 'short' });
+
+    const totalBills = (Number(inv.wifi || inv.MasterBill?.wifi_total) || 0) + 
+                       (Number(inv.water || inv.MasterBill?.water_total) || 0) + 
+                       (Number(inv.dust || inv.MasterBill?.dust_total) || 0) + 
+                       (Number(inv.electricity || inv.MasterBill?.electricity_total) || 0);
+    const splitAmount = Number(inv.split_per_user || (Number(inv.shared_bill_amount) - (Number(inv.bua || inv.MasterBill?.bua_total) || 0))) || 0;
+    const myElectricity = totalBills > 0 ? ((Number(inv.electricity || inv.MasterBill?.electricity_total) || 0) / totalBills) * splitAmount : 0;
+
     return {
       name: `${monthName} ${inv.year.toString().slice(-2)}`,
       Total: Number(inv.total_amount),
       Rent: Number(inv.rent_amount),
       Utilities: Number(inv.shared_bill_amount),
       Paid: Number(inv.amount_paid),
-      Electricity: Number(inv.electricity || 0)
+      Electricity: myElectricity
     };
   });
 
@@ -49,7 +57,7 @@ export default function BillingChart({ invoices }) {
           <option value="Paid">Amount Paid Only</option>
           <option value="Rent">Base Rent Only</option>
           <option value="Utilities">Utilities Only</option>
-          <option value="Electricity">Electricity Trend</option>
+          <option value="Electricity">My Electricity Trend</option>
         </select>
       </div>
 
@@ -82,7 +90,7 @@ export default function BillingChart({ invoices }) {
                 <Line type="monotone" dataKey="Utilities" name="Utilities Contribution" stroke="#3b82f6" strokeWidth={selectedMetric === 'Utilities' ? 3 : 2} strokeDasharray="5 5" dot={selectedMetric === 'Utilities' ? { r: 3 } : false} activeDot={{ r: 5 }} />
               )}
               {(selectedMetric === 'All' || selectedMetric === 'Electricity') && (
-                <Line type="monotone" dataKey="Electricity" name="Bldg. Electricity" stroke="#f43f5e" strokeWidth={selectedMetric === 'Electricity' ? 3 : 2} strokeDasharray="3 3" dot={selectedMetric === 'Electricity' ? { r: 3 } : false} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Electricity" name="My Electricity" stroke="#f43f5e" strokeWidth={selectedMetric === 'Electricity' ? 3 : 2} strokeDasharray="3 3" dot={selectedMetric === 'Electricity' ? { r: 3 } : false} activeDot={{ r: 5 }} />
               )}
             </LineChart>
           </ResponsiveContainer>
