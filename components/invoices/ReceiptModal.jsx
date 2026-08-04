@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Download, X, Building2, Calendar, Droplets, Zap, Wifi, Wind, Home, CheckCircle } from 'lucide-react';
+import { Download, X, Building2, Calendar, Droplets, Zap, Wifi, Wind, Home, CheckCircle, Plus } from 'lucide-react';
 import { toJpeg } from 'html-to-image';
 
 export default function ReceiptModal({ isOpen, onClose, invoice, softwareName }) {
@@ -70,7 +70,8 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
   const totalBills = (Number(invoice.wifi || invoice.MasterBill?.wifi_total) || 0) + 
                      (Number(invoice.water || invoice.MasterBill?.water_total) || 0) + 
                      (Number(invoice.dust || invoice.MasterBill?.dust_total) || 0) + 
-                     (Number(invoice.electricity || invoice.MasterBill?.electricity_total) || 0);
+                     (Number(invoice.electricity || invoice.MasterBill?.electricity_total) || 0) +
+                     (Number(invoice.other || invoice.MasterBill?.other_total) || 0);
 
   const splitAmount = Number(invoice.split_per_user || (Number(invoice.shared_bill_amount) - (Number(invoice.bua || invoice.MasterBill?.bua_total) || 0))) || 0;
 
@@ -78,6 +79,7 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
   const myWater = totalBills > 0 ? ((Number(invoice.water || invoice.MasterBill?.water_total) || 0) / totalBills) * splitAmount : 0;
   const myWifi = totalBills > 0 ? ((Number(invoice.wifi || invoice.MasterBill?.wifi_total) || 0) / totalBills) * splitAmount : 0;
   const myDust = totalBills > 0 ? ((Number(invoice.dust || invoice.MasterBill?.dust_total) || 0) / totalBills) * splitAmount : 0;
+  const myOther = totalBills > 0 ? ((Number(invoice.other || invoice.MasterBill?.other_total) || 0) / totalBills) * splitAmount : 0;
 
   return (
     <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex flex-col">
@@ -154,6 +156,10 @@ export default function ReceiptModal({ isOpen, onClose, invoice, softwareName })
                       <div className="flex justify-between items-center">
                         <span className="flex items-center gap-1.5"><Wind size={10} className="text-emerald-500"/> Dust/Cleaning (Your Split)</span>
                         <span>${myDust.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-1.5"><Plus size={10} className="text-purple-500"/> Other/Custom (Your Split)</span>
+                        <span>${myOther.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center border-t border-dashed border-slate-200 pt-2 mt-1">
                         <span className="text-slate-600 font-bold">Your Calculated Split</span>
