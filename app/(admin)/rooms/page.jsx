@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import api from '../../../lib/api';
-import { Plus, Building, User, Edit2, Check, X } from 'lucide-react';
+import { Plus, Building, User, Edit2, Check, X, Trash2 } from 'lucide-react';
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);
@@ -80,6 +80,27 @@ export default function RoomsPage() {
       console.error(err);
     }
   };
+
+  const handleDeleteRoom = async (roomId) => {
+    if (!window.confirm("Are you sure you want to delete this room and all its seats?")) return;
+    try {
+      await api.delete(`/rooms/${roomId}`);
+      fetchData();
+    } catch (err) {
+      console.error('Failed to delete room', err);
+    }
+  };
+
+  const handleDeleteSeat = async (seatId) => {
+    if (!window.confirm("Are you sure you want to delete this seat?")) return;
+    try {
+      await api.delete(`/seats/${seatId}`);
+      fetchData();
+    } catch (err) {
+      console.error('Failed to delete seat', err);
+    }
+  };
+
 
   if (loading) return <div className="text-slate-500 p-8">Loading properties...</div>;
 
@@ -200,6 +221,9 @@ export default function RoomsPage() {
                           <button onClick={() => setEditingRoom(room)} className="text-slate-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Edit2 size={14} />
                           </button>
+                          <button onClick={() => handleDeleteRoom(room.id)} className="text-slate-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       )}
                       <span className="text-xs font-medium bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full shrink-0">
@@ -236,13 +260,14 @@ export default function RoomsPage() {
                             ) : (
                               <>
                                 <div className="flex justify-between items-start mb-2">
-                                  <div className="flex items-center gap-1">
+                                  <div className="flex items-center gap-1.5">
                                     <span className={`font-bold ${seat.is_occupied ? 'text-rose-700' : 'text-emerald-700'}`}>{seat.name}</span>
-                                    {!seat.is_occupied && (
-                                      <button onClick={() => setEditingSeat(seat)} className="text-emerald-400 hover:text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Edit2 size={12} />
-                                      </button>
-                                    )}
+                                    <button onClick={() => setEditingSeat(seat)} className="text-slate-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <Edit2 size={12} />
+                                    </button>
+                                    <button onClick={() => handleDeleteSeat(seat.id)} className="text-slate-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <Trash2 size={12} />
+                                    </button>
                                   </div>
                                   <div className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${seat.is_occupied ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
                                     {seat.is_occupied ? 'Occupied' : 'Vacant'}

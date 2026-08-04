@@ -40,7 +40,7 @@ export default function BillingAndInvoicesPage() {
   const [billFormData, setBillFormData] = useState({
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
-    wifi: '', water: '', dust: '', electricity: '', bua: ''
+    wifi: '', water: '', dust: '', electricity: '', bua: '', other: ''
   });
 
   // ===================== LEDGER STATE =====================
@@ -187,12 +187,13 @@ export default function BillingAndInvoicesPage() {
         dust: Number(billFormData.dust) || 0,
         electricity: Number(billFormData.electricity) || 0,
         bua: Number(billFormData.bua) || 0,
+        other: Number(billFormData.other) || 0,
       });
       setIsBillModalOpen(false);
       setBillFormData({
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
-        wifi: '', water: '', dust: '', electricity: '', bua: ''
+        wifi: '', water: '', dust: '', electricity: '', bua: '', other: ''
       });
       fetchBills();
       fetchInvoices(); 
@@ -372,6 +373,9 @@ export default function BillingAndInvoicesPage() {
                <div className="flex flex-col gap-1.5 border-r border-slate-100 pr-4">
                  <span className="flex items-center gap-1.5"><Droplets size={12} className="text-cyan-500" /> ${row.water} Water</span>
                  <span className="flex items-center gap-1.5"><Wind size={12} className="text-emerald-500" /> ${row.dust} Dust/Clean</span>
+               </div>
+               <div className="flex flex-col gap-1.5 border-r border-slate-100 pr-4">
+                 <span className="flex items-center gap-1.5"><Plus size={12} className="text-purple-500" /> ${row.other || '0.00'} Other</span>
                </div>
                <div className="flex flex-col justify-center border-l-2 pl-4 border-indigo-100">
                   <span className="flex items-center gap-1.5 text-indigo-600 font-bold tracking-tight"><Home size={12} /> ${row.bua} Maid (Flat)</span>
@@ -828,11 +832,16 @@ export default function BillingAndInvoicesPage() {
                    <div className="absolute top-[29px] left-3 text-slate-400 font-semibold">$</div>
                    <input type="number" min="0" step="0.01" value={billFormData.dust} onChange={e => setBillFormData({...billFormData, dust: e.target.value})} className="w-full pl-7 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-indigo-500 focus:border-indigo-500 transition-all shadow-sm" placeholder="0.00" />
                  </div>
-                 <div className="relative col-span-2">
-                   <label className="block text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Home size={12} className="text-indigo-500"/> Maid (Bua) Cost - FLAT RATE</label>
-                   <div className="absolute top-[29px] left-3 text-slate-400 font-semibold">$</div>
-                   <input type="number" min="0" step="0.01" value={billFormData.bua} onChange={e => setBillFormData({...billFormData, bua: e.target.value})} className="w-full pl-7 pr-3 py-2.5 bg-indigo-50 border-2 border-indigo-200 rounded-xl text-sm font-bold text-indigo-900 focus:outline-none focus:border-indigo-500 transition-all shadow-sm" placeholder="0.00 (Unsplit)" />
-                 </div>
+                 <div className="relative">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Plus size={12} className="text-purple-500"/> Other / Custom Cost</label>
+                    <div className="absolute top-[29px] left-3 text-slate-400 font-semibold">$</div>
+                    <input type="number" min="0" step="0.01" value={billFormData.other} onChange={e => setBillFormData({...billFormData, other: e.target.value})} className="w-full pl-7 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-indigo-500 focus:border-indigo-500 transition-all shadow-sm" placeholder="0.00" />
+                  </div>
+                  <div className="relative col-span-2">
+                    <label className="block text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Home size={12} className="text-indigo-500"/> Maid (Bua) Cost - FLAT RATE</label>
+                    <div className="absolute top-[29px] left-3 text-slate-400 font-semibold">$</div>
+                    <input type="number" min="0" step="0.01" value={billFormData.bua} onChange={e => setBillFormData({...billFormData, bua: e.target.value})} className="w-full pl-7 pr-3 py-2.5 bg-indigo-50 border-2 border-indigo-200 rounded-xl text-sm font-bold text-indigo-900 focus:outline-none focus:border-indigo-500 transition-all shadow-sm" placeholder="0.00 (Unsplit)" />
+                  </div>
               </div>
 
               <div className="bg-indigo-50 p-4 rounded-xl flex items-start gap-3 border border-indigo-100">
@@ -907,6 +916,13 @@ export default function BillingAndInvoicesPage() {
                        <p className="font-bold text-slate-800 text-lg">${Number(selectedBill.dust).toFixed(2)}</p>
                      </div>
                    </div>
+                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start gap-3 col-span-2">
+                     <Plus size={18} className="text-purple-500 shrink-0 mt-0.5" />
+                     <div>
+                       <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Other / Custom Charge</p>
+                       <p className="font-bold text-slate-800 text-lg">${Number(selectedBill.other || 0).toFixed(2)}</p>
+                     </div>
+                   </div>
                 </div>
 
                 <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 flex items-center justify-between">
@@ -923,7 +939,7 @@ export default function BillingAndInvoicesPage() {
                 <div className="pt-2 border-t border-slate-100 flex justify-between items-center px-2">
                    <div>
                      <p className="text-xs font-bold text-slate-400">Total Sum Splittable:</p>
-                     <p className="text-sm font-black text-slate-800">${(Number(selectedBill.wifi) + Number(selectedBill.electricity) + Number(selectedBill.water) + Number(selectedBill.dust)).toFixed(2)}</p>
+                     <p className="text-sm font-black text-slate-800">${(Number(selectedBill.wifi) + Number(selectedBill.electricity) + Number(selectedBill.water) + Number(selectedBill.dust) + Number(selectedBill.other || 0)).toFixed(2)}</p>
                    </div>
                    <div className="text-right">
                      <p className="text-xs font-bold text-slate-400">Final Split / User:</p>
